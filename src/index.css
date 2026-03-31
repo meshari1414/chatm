@@ -1,0 +1,62 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: 'Cairo', sans-serif;
+  direction: rtl;
+}
+
+/* ─── Scrollbar ──────────────────────────────────────────────────────────── */
+::-webkit-scrollbar        { width: 4px; }
+::-webkit-scrollbar-track  { background: transparent; }
+::-webkit-scrollbar-thumb  { background: #3a5263; border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: #4a6273; }
+
+/* ─── Chat background pattern ────────────────────────────────────────────── */
+.chat-bg {
+  background-color: #0B141A;
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.02'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+
+
+/* ─── Animations ─────────────────────────────────────────────────────────── */
+@keyframes messageIn {
+  from { opacity: 0; transform: translateY(10px) scale(0.95); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.message-enter { animation: messageIn 0.2s ease-out forwards; }
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+.spinner { animation: spin 1s linear infinite; }
+
+/* ─── Recording pulse ────────────────────────────────────────────────────── */
+@keyframes recordPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.5; transform: scale(1.3); }
+}
+.record-pulse { animation: recordPulse 1.2s ease-in-out infinite; }
+
+/* ─── Image / video preview ──────────────────────────────────────────────── */
+.media-thumb {
+  max-width: 260px;
+  max-height: 260px;
+  object-fit: cover;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/* ─── Input focus ────────────────────────────────────────────────────────── */
+.input-focus:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px #0d9488;
+}
