@@ -17,13 +17,14 @@ import ProfileModal     from './ProfileModal'
 
 export default function Sidebar({ onSelectChat, activeChatId, onCloseChat }) {
   const { currentUser, userProfile, logout } = useAuth()
-  const [chats,       setChats]      = useState([])
-  const [search,      setSearch]     = useState('')
-  const [showAdd,     setShowAdd]    = useState(false)
-  const [showGroup,   setShowGroup]  = useState(false)
-  const [showMenu,    setShowMenu]   = useState(false)
-  const [showProfile, setShowProfile] = useState(false)
-  const [chatMeta,    setChatMeta]   = useState({}) // uid→{name,photo,username}
+  const [chats,        setChats]        = useState([])
+  const [search,       setSearch]       = useState('')
+  const [showAdd,      setShowAdd]      = useState(false)
+  const [showGroup,    setShowGroup]    = useState(false)
+  const [showMenu,     setShowMenu]     = useState(false)
+  const [showProfile,  setShowProfile]  = useState(false)
+  const [chatMeta,     setChatMeta]     = useState({})
+  const [openMenuId,   setOpenMenuId]   = useState(null) // uid→{name,photo,username}
 
   // ─── استماع للمحادثات الفعّالة ─────────────────────────────────────────────
   useEffect(() => {
@@ -112,7 +113,6 @@ export default function Sidebar({ onSelectChat, activeChatId, onCloseChat }) {
             <p className="text-chat-text font-semibold text-sm leading-tight">
               {userProfile?.displayName}
             </p>
-            <p className="text-chat-muted text-xs">@{userProfile?.username}</p>
           </div>
         </button>
 
@@ -189,8 +189,10 @@ export default function Sidebar({ onSelectChat, activeChatId, onCloseChat }) {
               if (lastMsg.deletedForAll) preview = 'تم حذف هذه الرسالة'
             }
 
+            const menuOpen = openMenuId === chat.id
+
             return (
-              <div key={chat.id} className="group relative">
+              <div key={chat.id} className="relative group">
                 <button
                   onClick={() => onSelectChat(chat)}
                   className={`w-full flex items-center gap-3 px-4 py-3 transition-colors text-right
@@ -224,15 +226,29 @@ export default function Sidebar({ onSelectChat, activeChatId, onCloseChat }) {
                   )}
                 </button>
 
-                {/* زر حذف الصديق — يظهر عند hover للمحادثات الفردية فقط */}
+                {/* زر ⋮ يظهر عند hover */}
                 {chat.type === 'private' && (
-                  <button
-                    onClick={e => handleDeleteFriend(e, chat)}
-                    className="absolute left-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 p-1.5 text-red-400 hover:text-red-300 hover:bg-red-400/10 rounded-lg transition-all"
-                    title="حذف الصديق"
-                  >
-                    <Trash2 size={15} />
-                  </button>
+                  <div className="absolute left-2 top-1/2 -translate-y-1/2">
+                    <button
+                      onClick={e => { e.stopPropagation(); setOpenMenuId(menuOpen ? null : chat.id) }}
+                      className="opacity-0 group-hover:opacity-100 p-1 text-chat-icon hover:text-chat-text hover:bg-chat-hover rounded-full transition-all"
+                    >
+                      <MoreVertical size={15} />
+                    </button>
+
+                    {/* القائمة المنسدلة */}
+                    {menuOpen && (
+                      <div className="absolute left-0 top-full mt-1 bg-chat-input border border-chat-border rounded-xl shadow-xl z-50 min-w-[140px] overflow-hidden animate-fade-in">
+                        <button
+                          onClick={e => handleDeleteFriend(e, chat)}
+                          className="flex items-center gap-2 w-full px-4 py-3 text-sm text-red-400 hover:bg-chat-hover transition-colors"
+                        >
+                          <Trash2 size={14} />
+                          حذف الصديق
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 )}
               </div>
             )
@@ -245,9 +261,12 @@ export default function Sidebar({ onSelectChat, activeChatId, onCloseChat }) {
       {showAdd     && <AddFriendModal   onClose={() => setShowAdd(false)}   onChatOpen={onSelectChat} />}
       {showGroup   && <CreateGroupModal onClose={() => setShowGroup(false)} onChatOpen={onSelectChat} />}
 
-      {/* Close menu on outside click */}
+      {/* Close menus on outside click */}
       {showMenu && (
         <div className="fixed inset-0 z-40" onClick={() => setShowMenu(false)} />
+      )}
+      {openMenuId && (
+        <div className="fixed inset-0 z-40" onClick={() => setOpenMenuId(null)} />
       )}
     </aside>
   )
